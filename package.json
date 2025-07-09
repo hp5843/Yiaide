@@ -1,0 +1,27 @@
+{
+  "name": "Yiaide",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "rsbuild build",
+    "dev": "rsbuild dev --open",
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "preview": "rsbuild preview"
+  },
+  "dependencies": {
+    "vant": "^4.9.20",
+    "vue": "^3.5.17",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "@rsbuild/core": "^1.4.2",
+    "@rsbuild/plugin-vue": "^1.0.7",
+    "eslint": "^9.29.0",
+    "eslint-plugin-vue": "^10.2.0",
+    "globals": "^16.2.0",
+    "prettier": "^3.5.3"
+  }
+}
