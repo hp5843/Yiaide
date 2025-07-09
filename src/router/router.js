@@ -1,65 +1,56 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router'
 
+import { request } from '../components/utils/utils'
 
-const routes = [
-  {
-    path: '/',
-    name: 'login',
-    meta: { requiresAuth: false } ,
-    component: () => import('../Login.vue')
-  },
-  {
-    path: '/index',
-    name: 'index',
-    redirect: '/home',
-    meta: { requiresAuth: true }, // 需要认证
-    component: () => import('../Index.vue'),
-    children: [
-      {
-        path: '/home',
-        name: 'home',
-        component: () => import('../components/home.vue')
-      },
-      {
-        path: '/dongtai',
-        name: 'dongtai',
-        component: () => import('../components/Dongtai.vue')
-      },
-      {
-        path: '/bbx',
-        name: 'bbx',
-        component: () => import('../components/Bbx.vue')
-      },
-      {
-        path: '/my',
-        name: 'my',
-        component: () => import('../components/My.vue')
-      },
-    ]
-  },
-  // 404路由必须放在最后
-  { 
-    path: '/:pathMatch(.*)*', 
-    component: () => import('../components/NotFound.vue'),
-    meta: { requiresAuth: false }
-  }
-];
+import Index from '../components/Index.vue'
+import Login from '../components/Login.vue'
+import NotFound from '../components/NotFound.vue'
+
+import Home from '../components/views/Home.vue'
+
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
-});
+  routes: [
+    { 
+      path: '/index', 
+      component: Index,
+      // redirect: '/home',
+      // meta: { requiresAuth: true }, // 需要认证
+      // children: [
+      //   {
+      //     path: '/home',
+      //     name: 'home',
+      //     component: Home
+      //   },
+      // ]
+    },
+    { 
+      path: '/', 
+      component: Login,
+      meta: { requiresAuth: false } // 明确设置为无需认证
+    },
+    // 404路由必须放在最后
+    { 
+      path: '/:pathMatch(.*)*', 
+      component: NotFound,
+      meta: { requiresAuth: false }
+    }
+  ]
+})
+
+
 
 // 新增验证函数
 async function validateToken() {
-  // try {
-  //   const res = await request.get('/index/validateExtend');
-  //   return res.code === 200;
-  // } catch (error) {
-  //   console.error('Token验证失败:', error);
-  //   return false;
-  // }
-  return true
+  return true;
+  try {
+    const res = await request.get('/index/validateExtend');
+    return res.code === 200;
+  } catch (error) {
+    console.error('Token验证失败:', error);
+    return false;
+  }
 }
 
 // 修改路由守卫
@@ -70,26 +61,22 @@ router.beforeEach(async (to, from, next) => {
     try {
       const isValid = await validateToken();
       if (isValid) {
-        next('/home');
+        next('/index');
       }
     } catch (error) {
       console.error('验证失败:', error);
     }
-  }else if (to.matched.some(record => record.meta.requiresAuth)) { // 需要认证
-    if (!isAuthenticated) { 
-      // 跳转回登录页
+  }else if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!isAuthenticated) {
       next({
         path: '/',
         query: { redirect: to.fullPath }
       });
     } else {
       const isValid = await validateToken();
-      if (isValid) { // 验证通过
+      if (isValid) {
         next();
-      } else { // 验证失败
-        // 清除本地存储的token
-        localStorage.removeItem('token');
-        // 跳转回登录页
+      } else {
         next({ path: '/',query: { redirect: to.fullPath } });
       }
     }
@@ -98,4 +85,4 @@ router.beforeEach(async (to, from, next) => {
   }
 });
 
-export default router;
+export default router

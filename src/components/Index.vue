@@ -2,7 +2,9 @@
     <div class="index-container">
         <!-- 页面内容区域 -->
         <div class="content">
-            <!-- <router-view /> -->
+             <div v-for="(item, index) in tabuis" :key="index" >
+                <component v-if="active===item.name" :is="item.component" />
+             </div>
         </div>
 
         <!-- 底部导航栏 -->
@@ -23,15 +25,22 @@
 
 <script>
 
-import homeSvg from './assets/svg/home.svg';
-import homeSvgActive from './assets/svg/home-active.svg';
 
-import dongtaiSvg from './assets/svg/dongtai.svg';
-import dongtaiSvgActive from './assets/svg/dongtai-active.svg';
 
-import bbxSvg from './assets/svg/bbx.svg';
-import bbxSvgActive from './assets/svg/bbx-active.svg';
+import homeSvg from '../assets/svg/home.svg';
+import homeSvgActive from '../assets/svg/home-active.svg';
 
+import dongtaiSvg from '../assets/svg/dongtai.svg';
+import dongtaiSvgActive from '../assets/svg/dongtai-active.svg';
+
+import bbxSvg from '../assets/svg/bbx.svg';
+import bbxSvgActive from '../assets/svg/bbx-active.svg';
+
+
+import Home from '../components/views/Home.vue';
+import Dongtai from '../components/views/Dongtai.vue';
+import Bbx from '../components/views/Bbx.vue';
+import My from '../components/views/My.vue';
 
 
 export default {
@@ -43,26 +52,24 @@ export default {
         { name: 'dongtai', text: '动态', icon: dongtaiSvg, iconActive: dongtaiSvgActive },
         { name: 'bbx', text: '百宝箱', icon: bbxSvg, iconActive: bbxSvgActive},
         { name: 'my', text: '我的', vanticon: 'contact-o'}
+      ],
+      tabuis: [
+        { name: 'home', component: Home },
+        { name: 'dongtai', component: Dongtai },
+        { name: 'bbx', component: Bbx },
+        { name: 'my', component: My },
       ]
     }
   },
   methods: {
-    handleTabChange(name) {
-      this.$router.push({ name });
-    }
+    
   },
   mounted() {
-    this.active = this.$route.name;
+
   },
   watch: {
-    $route(to, from) {
-      this.active = to.name;
-    }
+
   },
-  beforeRouteUpdate(to, from, next) {
-    this.active = to.name;
-    next();
-  }
 }
 </script>
 
