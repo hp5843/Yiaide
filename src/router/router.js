@@ -6,7 +6,7 @@ import Index from '../components/Index.vue'
 import Login from '../components/Login.vue'
 import NotFound from '../components/NotFound.vue'
 
-import Home from '../components/views/Home.vue'
+
 
 
 const router = createRouter({
@@ -15,15 +15,7 @@ const router = createRouter({
     { 
       path: '/index', 
       component: Index,
-      // redirect: '/home',
-      // meta: { requiresAuth: true }, // 需要认证
-      // children: [
-      //   {
-      //     path: '/home',
-      //     name: 'home',
-      //     component: Home
-      //   },
-      // ]
+      meta: { requiresAuth: true }, // 需要认证
     },
     { 
       path: '/', 
@@ -43,7 +35,7 @@ const router = createRouter({
 
 // 新增验证函数
 async function validateToken() {
-  return true;
+  return false;
   try {
     const res = await request.get('/index/validateExtend');
     return res.code === 200;
@@ -56,32 +48,34 @@ async function validateToken() {
 // 修改路由守卫
 router.beforeEach(async (to, from, next) => {
   const isAuthenticated = localStorage.getItem('token');
-  // 如果是根路径且已登录
-  if (to.path === '/' && isAuthenticated) {
-    try {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);  // 路由是否需要认证
+  
+  // 不需要认证的路由直接放行
+  if (!requiresAuth && to.path !== '/') {
+    return next();
+  }
+
+  try {
+    // 需要认证或访问根路径时验证token
+    if (isAuthenticated) {
       const isValid = await validateToken();
       if (isValid) {
-        next('/index');
+        return to.path === '/' ? next('/index') : next();
       }
-    } catch (error) {
-      console.error('验证失败:', error);
     }
-  }else if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!isAuthenticated) {
-      next({
+    
+    // 未认证或token无效的处理
+    if (requiresAuth) {
+      return next({
         path: '/',
         query: { redirect: to.fullPath }
       });
-    } else {
-      const isValid = await validateToken();
-      if (isValid) {
-        next();
-      } else {
-        next({ path: '/',query: { redirect: to.fullPath } });
-      }
     }
-  } else {
     next();
+  } catch (error) {
+    localStorage.removeItem('token');
+    console.error('验证失败:', error);
+    next('/');
   }
 });
 
