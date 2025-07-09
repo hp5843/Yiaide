@@ -2,7 +2,7 @@
     <div class="index-container">
         <!-- 页面内容区域 -->
         <div class="content">
-            <router-view />
+            <!-- <router-view /> -->
         </div>
 
         <!-- 底部导航栏 -->
@@ -50,6 +50,18 @@ export default {
     handleTabChange(name) {
       this.$router.push({ name });
     }
+  },
+  mounted() {
+    this.active = this.$route.name;
+  },
+  watch: {
+    $route(to, from) {
+      this.active = to.name;
+    }
+  },
+  beforeRouteUpdate(to, from, next) {
+    this.active = to.name;
+    next();
   }
 }
 </script>

@@ -3,7 +3,7 @@ import Vant from 'vant';
 import App from './App.vue';
 import 'vant/lib/index.css';
 import './index.css';
-import router from './router';
+import router from './router/router';
 
 const app = createApp(App);
 
